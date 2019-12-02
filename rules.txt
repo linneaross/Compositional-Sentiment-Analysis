@@ -1,0 +1,52 @@
+NP Adj N
+NP Det N
+NP Det NP
+NP Adj NP
+NP NP ConjNP
+N N ConjN
+
+Adj Adv Adj
+Adj Adj ConjAdj
+
+PP Prep NP
+PP Prep N
+PP PP ConjPP
+PP Prep NegP
+
+ConjAdj Conj Adj
+ConjN Conj N
+ConjNP Conj NP
+ConjV Conj V
+ConjVP Conj VP
+ConjAdv Conj Adv
+ConjPP Conj PP
+ConjS Conj S
+ConjNeg Conj NegP
+
+NegP Neg Adj
+NegP Neg NP
+NegP Neg N
+NegP Neg VP
+NegP Neg V
+NegP Neg S
+NegP Neg PP
+NegP Neg Adv
+NegP NegP ConjNeg
+
+VP V NP
+VP V N
+VP V Adj
+VP V PP
+VP V NegP
+VP Adv V
+VP V Adv
+VP Adv VP
+VP VP Adv
+V V ConjV
+VP VP ConjVP
+
+S NP VP
+S N VP
+S N V
+S NP V
+S S ConjS

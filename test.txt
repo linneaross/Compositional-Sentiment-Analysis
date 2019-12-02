@@ -1,0 +1,24 @@
+pos#i love the movie
+neg#i hate the movie
+pos#i enjoy the movie
+neg#i dislike the movie
+pos#it was enjoyable
+pos#it was adequate
+pos#it was fine
+neg#it was unenjoyable
+neg#it was inadequate
+neg#it was uninteresting
+neg#not good
+neg#not terrible
+pos#not amazing
+neg#not too good
+pos#it was not bad
+neg#not exciting
+pos#not boring
+neg#I not enjoy the movie
+pos#good and interesting
+neg#funny but terrible
+pos#bad but interesting
+pos#fine and decent
+neg#bad and uninteresting
+pos#it was decent but the actor was very bad
