@@ -1,0 +1,38 @@
+neg#it was not good but it was successful
+pos#it was good but it was not successful
+neg#it was bad but it was successful
+neg#it was not bad but it was not successful
+pos#it is not a successful film but i am impressed
+neg#it is not an unsuccessful film but i am unimpressed
+neg#it was not good
+pos#it was not bad
+neg#it was not fine
+neg#it was not adequate
+pos#it was not inadequate
+pos#it was not boring
+neg#it was not interesting
+neg#the movie was not enjoyable
+pos#the movie was not unenjoyable
+neg#the movie was not amazing
+neg#the movie was n't terrible
+pos#the movie was n't mediocre
+neg#i do not like the actor
+neg#i do not like the bad actor
+neg#i do not like the good actor
+pos#i do not dislike the good actor
+pos#i do not dislike the bad actor
+pos#i do not dislike the actor
+pos#i do not hate the plot
+neg#i do not love the plot
+pos#the acting is n't terrible
+neg#the acting is n't brilliant
+pos#the main actor did n't give an unimpressive performance
+neg#the main actor did n't give an impressive performance
+neg#not a successful film
+pos#not an unsuccessful film
+neg#i am not impressed
+pos#i am not unimpressed
+pos#not a dreadful performance
+neg#not a wonderful performance
+neg#not the best film of the year
+pos#not the worst film of the year

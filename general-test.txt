@@ -1,0 +1,44 @@
+pos#it was good
+neg#it was bad
+pos#it was fine
+pos#it was adequate
+neg#it was inadequate
+neg#it was boring
+pos#it was interesting
+pos#the movie was enjoyable
+neg#the movie was unenjoyable
+pos#the movie was amazing
+neg#the movie was terrible
+neg#the movie was mediocre
+pos#i like the actor
+pos#i like the bad actor
+pos#i like the good actor
+neg#i dislike the good actor
+neg#i dislike the bad actor
+neg#i dislike the actor
+neg#i hate the plot
+pos#i love the plot
+neg#the acting is terrible
+pos#the acting is brilliant
+pos#the main actor gives an impressive performance
+neg#the main actor gives an unimpressive performance
+pos#a successful film
+neg#an unsuccessful film
+pos#i am impressed
+neg#i am unimpressed
+neg#a dreadful performance
+pos#a wonderful performance
+pos#amazing actor
+neg#terrible actor
+pos#the amazing actor gave a wonderful performance
+neg#the terrible actor gave a dreadful performance
+pos#the terrible actor gave a wonderful performance
+neg#the amazing actor gave a dreadful performance
+neg#the terrible plot ruins the movie
+pos#i really love the awful film
+neg#i really hate the awful film
+pos#the brilliant acting outshines the bad plot
+neg#the bad plot outshines the brilliant acting
+pos#the best film of the year
+neg#the worst film of the year
+neg#the brilliant actor was excellent in the film but the direction was misguided and detrimental

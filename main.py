@@ -10,11 +10,23 @@ from senticnet5 import senticnet
 # part of speech tagger
 import nltk
 #nltk.download('averaged_perceptron_tagger')
-import Tag
-import PureStatistical
-import Compositional
+treebank = {}
+scores = {}
+for line in open('dictionary.txt'):
+    line_and_index = line.split('|')
+    line = line_and_index[0].strip()
+    line = line.lower()
+    line = line.translate(None, string.punctuation)
+    index = re.sub('\n','', line_and_index[1])
+    treebank[line] = index
+for line in open('sentiment_labels.txt'):
+    index_and_score = line.split('|')
+    score = re.sub('\n','', index_and_score[1])
+    scores[index_and_score[0]] = score
+for item in treebank:
+    treebank[item] = scores[treebank[item]]
 
-
+# sentiwords lexical sentiment resource - not currently in use
 sentiwords = {}
 for line in open('sentiwords.txt'):
     word = line.split('#')
@@ -55,18 +67,17 @@ rules = parse_rules(rules)
 
 nb = PureStatistical(pos_data, neg_data, test_dict, 3, .001)
 nb.train_model()
-nb_results = nb.test(test_dict, .001, verbose=False)
 print 'NB'
 print nb_results
 
-comp = Compositional(rules, test_dict, None)
+comp = Compositional(rules, test_dict, None, False, 0.5, 0.0, 0.9, 0.9, 0.7, 0.75)
 comp_results = comp.test()
-print 'COMP'
+print 'LEX-COMP'
 print comp_results
 
-hybrid = Compositional(rules, test_dict, nb)
+hybrid = Compositional(rules, test_dict, nb, False, 0.5, 0.4, 0.6, 0.2, 0.7, 0.75)
 hybrid_results = hybrid.test()
-print 'HYBRID'
+print 'STAT-COMP'
 print hybrid_results
 
 def test_models(test_dict, nb_output, comp_output, hybrid_output=None):
@@ -191,5 +202,13 @@ def report_results(test_results):
         print 'RECALL: ' + str(test_results[model]['recall'])
         print 'F-SCORE: ' + str(test_results[model]['f-score'])
 
+print 'PURE-STAT length: ' + str(len(nb_results))
+print 'LEX-COMP length: ' + str(len(comp_results))
+print 'STAT-COMP length: ' + str(len(hybrid_results))
+for item in nb_results:
+    if item not in comp_results:
+        print 'Item not parsed by LEX-COMP: ' + item
+    elif item not in hybrid_results:
+        print 'Item not parsed by STAT-COMP: ' + item
 results = test_models(test_dict, nb_results, comp_results, hybrid_results)
 report_results(results)

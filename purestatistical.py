@@ -91,6 +91,14 @@ class PureStatistical:
                 best_tag = label
         return best_tag, pos_prob, neg_prob
 
+    def even_split(self, word):
+        if self.class_unit_counts['pos'][''][word] > 0.0:
+            return self.class_unit_counts['pos'][''][word]/(self.class_unit_counts['pos'][''][word]+self.class_unit_counts['neg'][''][word])
+        elif self.class_unit_counts['neg'][''][word] > 0.0:
+            return 1-(self.class_unit_counts['pos'][''][word]/(self.class_unit_counts['pos'][''][word]+self.class_unit_counts['neg'][''][word]))
+        else:
+            return 0.5
+
     def classify_datum(self, datum, alpha):
         storage = {}
         tokens = self.tokenize(datum)

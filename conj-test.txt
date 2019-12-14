@@ -1,0 +1,24 @@
+neg#the acting was brilliant but the movie was terrible
+pos#the acting was terrible but the movie was brilliant
+neg#the movie was terrible but the acting was brilliant
+neg#the movie was brilliant but the acting was terrible
+neg#it was unsuccessful and funny
+pos#it was unsuccessful but funny
+neg#it was funny but unsuccessful
+pos#it was funny and successful
+neg#it was unfunny and unsuccessful
+pos#the amazing actor gave a wonderful performance but the film was unsuccessful
+neg#it was boring but it was funny
+neg#it was funny but it was boring
+pos#amazing and interesting
+pos#terrible but interesting
+pos#interesting and amazing
+neg#interesting but terrible
+neg#it is a successful film but i am unimpressed
+pos#it is an unsuccessful film but i am impressed
+neg#it was not good but it was successful
+pos#it was good but it was not successful
+neg#it was bad but it was successful
+neg#it was not bad but it was not successful
+pos#it is not a successful film but i am impressed
+neg#it is not an unsuccessful film but i am unimpressed

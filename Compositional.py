@@ -13,29 +13,44 @@ import nltk
 
 class Compositional:
 
-    def __init__(self, rules, test, hybrid_model=None, and_case=0.5, but_case=0.3, v=0.6, np=0.7, s=0.4):
+    def __init__(self, rules, test, hybrid_model=None, verbose=False,and_case=0.5, but_case=0.5, neg=1.3, v=1.0, np=0.7, s=0.75):
         self.rule_file = rules
         self.test_data = test
         self.hybrid = hybrid_model
         self.and_left_weight = and_case
         self.but_left_weight = but_case
+        self.neg_param = neg
         self.v_weight = v
         self.np_weight = np
         self.s_weight = s
         self.rules = rules
+        self.verbose = verbose
 
     def tag_sentence(self, sentence):
         # tag the sentence with words and populate the parsing matrix
         sentence = self.tokenize(sentence)
-        parts_of_speech = nltk.pos_tag(sentence)
+        #parts_of_speech = nltk.pos_tag(sentence)
         matrix = []
         for i in range(len(sentence)):
             matrix.append([])
             for j in range(len(sentence)):
                 matrix[i].append([])
-        for x in range(len(parts_of_speech)):
+        for x in range(len(sentence)):
             #matrix[x][x] = [self.tag_word(sentence[x])]
-            matrix[x][x].append(self.tag_word(parts_of_speech[x][0], parts_of_speech[x][1]))
+            matrix[x][x].append(self.create_word_tag(sentence[x]))
+        if self.verbose:
+            print 'new matrix'
+            print '=========='
+            for row in range(len(matrix)):
+                result = ''
+                for col in range(len(matrix[row])):
+                    if len(matrix[row][col]) > 0:
+                        for item in matrix[row][col]:
+                            result = result + ' ' + item.get_pos() + '\t'
+                    else:
+                        result += '[]\t'
+                print result
+            print '==========='
         return matrix
 
     def tokenize(self, sentence):
@@ -43,24 +58,14 @@ class Compositional:
         sentence = sentence.strip()
         tokens = sentence.split()
         return tokens
-    '''
-    def parse_rules(self):
-        print 'parsing rules!'
-        rules = {}
-        for line in self.rule_file:
-            print line
-            line = line.strip()
-            tokenized = line.split()
-            if len(tokenized) > 0:
-                left_side = tokenized[0]
-                right_side = tokenized[1:]
-                if left_side not in rules:
-                    rules[left_side] = []
-                rules[left_side].append(right_side)
-        self.rules = rules
-        print self.rules
-    '''
-    def tag_word(self, word, pos):
+
+    def create_word_tag(self, word):
+        pos = word
+        sentiment = self.word_sentiment(word)
+        bp = None
+        return Tag(pos, sentiment, bp)
+
+    def tag_word(self, word):
         # tag each word with part of speech and sentiment feature value
         tagged_pos = pos
         if word == 'not':
@@ -92,55 +97,68 @@ class Compositional:
 
     def word_sentiment(self, word):
         if self.hybrid == None:
-            if word not in sentiwords:
+            if word not in treebank:
                 sentiment = 0.0
             else:
-                sentiment = sentiwords[word]
-            # using senticnet
-            '''
-            if word not in senticnet:
-                sentiment = 0.0
-            else:
-                sentiment = float(senticnet[word][7])
-            '''
-            # making all relatively neutral sentiment values true neutral
-            if sentiment < 0.2 and sentiment > -0.2:
-                sentiment = 0.0
+                prob = float(treebank[word])
+                normalized = (2 * (prob-0)/(1-0)) - 1
+                sentiment = normalized
         else:
-            tag, pos_prob, neg_prob = self.hybrid.classify_word(word, .001)
-            '''
-            if pos_prob < neg_prob:
-                sentiment = 2 * ((neg_prob-self.hybrid.min_prob)/(self.hybrid.max_prob-self.hybrid.min_prob)-1)
+            pos_percentage = self.hybrid.even_split(word)
+            if pos_percentage > 0.5:
+                sentiment = (2 * pos_percentage)-1
+            elif pos_percentage < 0.5:
+                sentiment = (2 * pos_percentage)-1
             else:
-                sentiment = 2 * ((pos_prob-self.hybrid.min_prob)/(self.hybrid.max_prob-self.hybrid.min_prob)-1) +
-            '''
-            if pos_prob == neg_prob or (pos_prob - neg_prob) < 0.00001 and (pos_prob - neg_prob) > -0.00001:
                 sentiment = 0.0
-            elif tag == 'pos':
-                sentiment = 0.8
-            elif tag == 'neg':
-                sentiment = -0.3
-            #print word
-            #print sentiment
         return sentiment
 
     def parse(self, matrix):
+        unary_checked = []
         for row in reversed(range(len(matrix))):
-            for column in reversed(range(len(matrix))):
+            for column in (range(len(matrix))):
                 if row != column and row<column:
-                    #for k in range(row):
                     for k in range(row,column):
                         for left_tag in matrix[row][k]:
+                            if left_tag not in unary_checked:
+                                matrix[row][k] += (self.get_parent_unary(left_tag))
+                                unary_checked.append(left_tag)
                             for down_tag in matrix[k+1][column]:
-                                matrix[row][column] += (self.get_parent(left_tag, down_tag))
-        #if self.hybrid != None:
-            #print 'NEW MATRIX'
-            #print matrix[0][len(matrix)-1]
-        #print 'final parse found?'
-        #print len(matrix[0][len(matrix)-1]) > 0
+                                if down_tag not in unary_checked:
+                                    matrix[k+1][column] += (self.get_parent_unary(down_tag))
+                                matrix[row][column] += (self.get_parent_binary(left_tag, down_tag))
+                                #if len(self.get_parent_binary(left_tag, down_tag)) > 0:
+                                    #print left_tag.get_pos(), down_tag.get_pos(), self.get_parent_binary(left_tag, down_tag)[0].get_pos()
+                                #else:
+                                    #print 'no results for ' + left_tag.get_pos(), down_tag.get_pos()
+        if self.verbose:
+            print 'parsed:'
+            print '=========='
+            for row in range(len(matrix)):
+                result = ''
+                for col in range(len(matrix[row])):
+                    result = result + ' ST: '
+                    if len(matrix[row][col]) > 0:
+                        for item in matrix[row][col]:
+                            result = result + ' ' + item.get_pos() + '\t\t\t'
+                    else:
+                        result += '[]\t\t\t'
+                print result
+            print '==========='
         return matrix[0][len(matrix)-1], matrix
 
-    def get_parent(self, left, down):
+    def get_parent_unary(self, child):
+        result = []
+        right_side = [child.get_pos()]
+        for left_side in self.rules:
+            if right_side in self.rules[left_side]:
+                pos = left_side
+                sentiment = child.get_sentiment()
+                tag = Tag(pos, sentiment, child)
+                result.append(tag)
+        return result
+
+    def get_parent_binary(self, left, down):
         result = []
         right_side = [left.get_pos(), down.get_pos()]
         for left_side in self.rules:
@@ -154,8 +172,8 @@ class Compositional:
     def combine_sentiment(self, left, down, parent):
         sentiment = 0.0
         # neg case:
-        if parent == 'NegP':
-            sentiment = self.neg(down)
+        if parent[:3] == 'Neg':
+            sentiment = self.neg(down, self.neg_param)
         # conj case:
         elif left.get_pos() == 'Conj':
             sentiment = down.get_sentiment()
@@ -174,17 +192,24 @@ class Compositional:
         # general case
         else:
             # equal weights to both sides
-            sentiment = self.general(left, down, 0.5)
+            sentiment = self.general(left, down, 0.7)
         #print 'combining sentiment of ' + left.get_pos() + ' ' + down.get_pos()
         #print parent, sentiment
         return sentiment
 
-    def neg(self, down, hyperparameter=0.35):
-        # fix this actual formula
-        return (down.get_sentiment() - hyperparameter)
+    def neg(self, down, hyperparameter=1.0):
+        # sliding weight depending on the value - higher sentiment score, higher weight
+        # the value for change is the amount the original score will be changed
+        # to find this, we square the sentiment of the negated nonterminal
+        if down.get_sentiment() > 0:
+            return down.get_sentiment()-hyperparameter
+        elif down.get_sentiment() < 0:
+            return down.get_sentiment()+hyperparameter
+        else:
+            return 0.0
+
 
     def conj(self, left, down):
-        # check about neutrality !!!!!
         # same sign on each side - 'AND' CASE
         if (left.get_sentiment() * down.get_sentiment()) >= 0:
             return ((left.get_sentiment() * self.and_left_weight) + (down.get_sentiment() * (1-self.and_left_weight)))
@@ -202,26 +227,27 @@ class Compositional:
         else:
             return (left.get_sentiment() * weight) + (down.get_sentiment() * (1-weight))
 
-    def test(self, verbose=False):
+    def test(self):
         #self.parse_rules()
         tagged_sentences = {}
         for item in self.test_data:
             tagged = self.tag_sentence(item)
             tags, matrix = self.parse(tagged)
-            for tag in tags:
-                final_sentiment = tag.get_sentiment()
-                if final_sentiment > 0:
-                    cast_sentiment = 'pos'
-                elif final_sentiment < 0:
-                    cast_sentiment = 'neg'
-                else:
-                    cast_sentiment = 'neut'
-                if verbose:
-                    print 'SENTENCE: ' + item.strip()
-                    print 'FINAL SENTIMENT: ' + str(final_sentiment)
-                    print 'SENTIMENT TAG: ' + str(cast_sentiment)
-                    print 'FINAL PARSE: ' + tag.get_pos()
-                tagged_sentences[item] = cast_sentiment
-            if len(tags) == 0 and verbose:
+            final_sentiment = tags[0].get_sentiment()
+            if final_sentiment > 0:
+                cast_sentiment = 'pos'
+            elif final_sentiment < 0:
+                cast_sentiment = 'neg'
+            else:
+                cast_sentiment = 'neut'
+            if self.verbose:
+                print 'SENTENCE: ' + item.strip()
+                print 'FINAL SENTIMENT: ' + str(final_sentiment)
+                print 'SENTIMENT TAG: ' + str(cast_sentiment)
+                print 'FINAL PARSE: ' + tags[0].get_pos()
+                print '====='
+            tagged_sentences[item] = cast_sentiment
+            if len(tags) == 0 and self.verbose:
                 print 'No parse found!'
+                print '====='
         return tagged_sentences

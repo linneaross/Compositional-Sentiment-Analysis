@@ -1,24 +1,100 @@
-pos#i love the movie
-neg#i hate the movie
-pos#i enjoy the movie
-neg#i dislike the movie
-pos#it was enjoyable
-pos#it was adequate
-pos#it was fine
-neg#it was unenjoyable
-neg#it was inadequate
-neg#it was uninteresting
-neg#not good
-neg#not terrible
-pos#not amazing
-neg#not too good
+neg#the acting was brilliant but the movie was terrible
+pos#the acting was terrible but the movie was brilliant
+neg#the movie was terrible but the acting was brilliant
+neg#the movie was brilliant but the acting was terrible
+pos#it was unsuccessful and funny
+pos#it was unsuccessful but funny
+pos#it was funny but unsuccessful
+pos#it was funny and successful
+neg#it was unfunny and unsuccessful
+pos#the amazing actor gave a wonderful performance but the film was unsuccessful
+neg#it was boring but it was funny
+neg#it was funny but it was boring
+pos#amazing and interesting
+pos#terrible and interesting
+pos#interesting and amazing
+pos#interesting and terrible
+neg#it is a successful film but i am unimpressed
+pos#it is an unsuccessful film but i am impressed
+neg#it was not good but it was successful
+pos#it was good but it was not successful
+neg#it was bad but it was successful
+neg#it was not bad but it was not successful
+pos#it is not a successful film but i am impressed
+neg#it is not an unsuccessful film but i am unimpressed
+neg#it was not good
 pos#it was not bad
-neg#not exciting
-pos#not boring
-neg#I not enjoy the movie
-pos#good and interesting
-neg#funny but terrible
-pos#bad but interesting
-pos#fine and decent
-neg#bad and uninteresting
-pos#it was decent but the actor was very bad
+neg#it was not fine
+neg#it was not adequate
+pos#it was not inadequate
+pos#it was not boring
+neg#it was not interesting
+neg#the movie was not enjoyable
+pos#the movie was not unenjoyable
+neg#the movie was not amazing
+neg#the movie was n't terrible
+pos#the movie was n't mediocre
+neg#i do not like the actor
+neg#i do not like the bad actor
+neg#i do not like the good actor
+pos#i do not dislike the good actor
+pos#i do not dislike the bad actor
+pos#i do not dislike the actor
+pos#i do not hate the plot
+neg#i do not love the plot
+pos#the acting is n't terrible
+neg#the acting is n't brilliant
+pos#the main actor did n't give an unimpressive performance
+neg#the main actor did n't give an impressive performance
+neg#not a successful film
+pos#not an unsuccessful film
+neg#i am not impressed
+pos#i am not unimpressed
+pos#not a dreadful performance
+neg#not a wonderful performance
+neg#not the best film of the year
+pos#not the worst film of the year
+pos#it was good
+neg#it was bad
+pos#it was fine
+pos#it was adequate
+neg#it was inadequate
+neg#it was boring
+pos#it was interesting
+pos#the movie was enjoyable
+neg#the movie was unenjoyable
+pos#the movie was amazing
+neg#the movie was terrible
+neg#the movie was mediocre
+pos#i like the actor
+pos#i like the bad actor
+pos#i like the good actor
+neg#i dislike the good actor
+neg#i dislike the bad actor
+neg#i dislike the actor
+neg#i hate the plot
+pos#i love the plot
+neg#the acting is terrible
+pos#the acting is brilliant
+pos#the main actor gives an impressive performance
+neg#the main actor gives an unimpressive performance
+pos#a successful film
+neg#an unsuccessful film
+pos#i am impressed
+neg#i am unimpressed
+neg#a dreadful performance
+pos#a wonderful performance
+pos#amazing actor
+neg#terrible actor
+pos#the amazing actor gave a wonderful performance
+neg#the terrible actor gave a dreadful performance
+pos#the terrible actor gave a wonderful performance
+neg#the amazing actor gave a dreadful performance
+neg#the terrible plot ruins the movie
+pos#i really love the awful film
+neg#i really hate the awful film
+pos#the brilliant acting outshines the bad plot
+neg#the bad plot outshines the brilliant acting
+pos#the best film of the year
+neg#the worst film of the year
+neg#the brilliant actor was excellent in the film but the direction was misguided and detrimental

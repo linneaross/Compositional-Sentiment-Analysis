@@ -1,52 +1,145 @@
-NP Adj N
-NP Det N
-NP Det NP
-NP Adj NP
-NP NP ConjNP
-N N ConjN
+V was
+V gave
+V is
+V am
+V love
+V hate
+V like
+V dislike
+V give
+V gives
+V ruins
+V outshines
 
-Adj Adv Adj
+Adj brilliant
+Adj terrible
+Adj unsuccessful
+Adj successful
+Adj funny
+Adj unfunny
+Adj amazing
+Adj wonderful
+Adj boring
+Adj interesting
+Adj uninteresting
+Adj unimpressed
+Adj impressed
+Adj good
+Adj bad
+Adj fine
+Adj inadequate
+Adj adequate
+Adj enjoyable
+Adj unenjoyable
+Adj mediocre
+Adj impressive
+Adj unimpressive
+Adj main
+Adj dreadful
+Adj best
+Adj worst
+Adj awful
+Adj excellent
+Adj misguided
+Adj detrimental
+
+Adv very
+Adv really
+Adv quite
+Adv too
+Adv pretty
+
+Pronoun i
+Pronoun we
+Pronoun you
+Pronoun they
+Pronoun he
+Pronoun she
+Pronoun it
+Pronoun me
+
+Noun acting
+Noun movie
+Noun actor
+Noun performance
+Noun film
+Noun year
+Noun direction
+Noun plot
+
+Modal can
+Modal could
+Modal is
+Modal do
+Modal did
+
+Conj but
+Conj and
+Conj though
+Conj yet
+
+Det the
+Det a
+Det an
+
+Neg not
+Neg n't
+
+Prep in
+Prep on
+Prep under
+Prep about
+Prep of
+Prep by
+
+DP Pronoun
+DP Det NP
+DP DP ConjDP
+
+AdvP Adv NP
+AdvP Adv AdvP
+AdvP Adv Adj
+
 Adj Adj ConjAdj
 
-PP Prep NP
-PP Prep N
-PP PP ConjPP
-PP Prep NegP
+NP Adj NP
+NP NP PP
+NP Noun
 
-ConjAdj Conj Adj
-ConjN Conj N
-ConjNP Conj NP
-ConjV Conj V
-ConjVP Conj VP
-ConjAdv Conj Adv
-ConjPP Conj PP
-ConjS Conj S
-ConjNeg Conj NegP
-
-NegP Neg Adj
-NegP Neg NP
-NegP Neg N
-NegP Neg VP
-NegP Neg V
-NegP Neg S
-NegP Neg PP
-NegP Neg Adv
-NegP NegP ConjNeg
-
-VP V NP
-VP V N
-VP V Adj
+VP V DP
+VP VP DP
 VP V PP
-VP V NegP
-VP Adv V
-VP V Adv
-VP Adv VP
-VP VP Adv
-V V ConjV
+VP VP PP
+VP VP DP
 VP VP ConjVP
+VP V NegDP
+VP VP NegDP
+VP Modal VP
+VP Modal NegVP
+VP Modal NegAdvP
+VP V AdvP
+VP V Adj
+VP Adv V
+VP V NegAdj
+VP V ConjNegAdj
 
-S NP VP
-S N VP
-S N V
-S NP V
+ConjDP Conj DP
+ConjVP ConjVP
+ConjS Conj S
+ConjAdj Conj Adj
+ConjNegAdj Conj NegAdj
+
+NegDP Neg NP
+NegDP Neg DP
+NegVP Neg VP
+NegVP Neg V
+NegAdj Neg Adj
+NegAdvP Neg AdvP
+
+PP Prep DP
+
+S DP VP
 S S ConjS
+S NegDP NegVP
+S NegDP VP
+S DP NegVP
