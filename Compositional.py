@@ -7,9 +7,40 @@ import re
 # lexical sentiment resources
 from senticnet5 import senticnet
 #from pattern.en import sentiment
-# part of speech tagger
+
+# NLTK part of speech tagger
 import nltk
 #nltk.download('averaged_perceptron_tagger')
+
+# populating a dict that can be used for lexical sentiment values
+# from Stanford Sentiment Treebank resource
+treebank = {}
+scores = {}
+for line in open('dictionary.txt'):
+    line_and_index = line.split('|')
+    line = line_and_index[0].strip()
+    line = line.lower()
+    line = line.translate(None, string.punctuation)
+    index = re.sub('\n','', line_and_index[1])
+    treebank[line] = index
+for line in open('sentiment_labels.txt'):
+    index_and_score = line.split('|')
+    score = re.sub('\n','', index_and_score[1])
+    scores[index_and_score[0]] = score
+for item in treebank:
+    treebank[item] = scores[treebank[item]]
+
+# populating a dict that can be used for lexical sentiment values
+# from Sentiwords resource
+sentiwords = {}
+for line in open('sentiwords.txt'):
+    word = line.split('#')
+    word = word[0]
+    score = re.split('\t|\n',line)
+    score = score[1].strip()
+    if re.match(r'(-*)(\d)(\.*)(\d*)', score):
+        score = float(score)
+        sentiwords[word] = score
 
 class Compositional:
 
@@ -29,14 +60,12 @@ class Compositional:
     def tag_sentence(self, sentence):
         # tag the sentence with words and populate the parsing matrix
         sentence = self.tokenize(sentence)
-        #parts_of_speech = nltk.pos_tag(sentence)
         matrix = []
         for i in range(len(sentence)):
             matrix.append([])
             for j in range(len(sentence)):
                 matrix[i].append([])
         for x in range(len(sentence)):
-            #matrix[x][x] = [self.tag_word(sentence[x])]
             matrix[x][x].append(self.create_word_tag(sentence[x]))
         if self.verbose:
             print 'new matrix'
@@ -54,22 +83,24 @@ class Compositional:
         return matrix
 
     def tokenize(self, sentence):
+        # compositional tokenization function
         sentence = sentence.lower()
         sentence = sentence.strip()
         tokens = sentence.split()
         return tokens
 
     def create_word_tag(self, word):
+        # generates a new tag for a word
         pos = word
         sentiment = self.word_sentiment(word)
         bp = None
         return Tag(pos, sentiment, bp)
 
     def tag_word(self, word):
+        # DEPRECATED: was used before unary branching rules were added to ruleset
         # tag each word with part of speech and sentiment feature value
         tagged_pos = pos
         if word == 'not':
-            # EXPAND THIS
             pos = 'Neg'
         else:
             if tagged_pos == 'CC':
@@ -96,6 +127,8 @@ class Compositional:
         return tag
 
     def word_sentiment(self, word):
+        # calculates sentiment for a word
+        # hybrid model case:
         if self.hybrid == None:
             if word not in treebank:
                 sentiment = 0.0
@@ -103,6 +136,7 @@ class Compositional:
                 prob = float(treebank[word])
                 normalized = (2 * (prob-0)/(1-0)) - 1
                 sentiment = normalized
+        # pure lexical compositional case
         else:
             pos_percentage = self.hybrid.even_split(word)
             if pos_percentage > 0.5:
@@ -114,6 +148,7 @@ class Compositional:
         return sentiment
 
     def parse(self, matrix):
+        # CKY parsing algorithm
         unary_checked = []
         for row in reversed(range(len(matrix))):
             for column in (range(len(matrix))):
@@ -148,6 +183,7 @@ class Compositional:
         return matrix[0][len(matrix)-1], matrix
 
     def get_parent_unary(self, child):
+        # returns unary branching parents
         result = []
         right_side = [child.get_pos()]
         for left_side in self.rules:
@@ -159,6 +195,7 @@ class Compositional:
         return result
 
     def get_parent_binary(self, left, down):
+        # returns possible parents for binary combinations
         result = []
         right_side = [left.get_pos(), down.get_pos()]
         for left_side in self.rules:
@@ -170,6 +207,7 @@ class Compositional:
         return result
 
     def combine_sentiment(self, left, down, parent):
+        # calculates binary combination sentiment
         sentiment = 0.0
         # neg case:
         if parent[:3] == 'Neg':
@@ -177,7 +215,7 @@ class Compositional:
         # conj case:
         elif left.get_pos() == 'Conj':
             sentiment = down.get_sentiment()
-        # conjP case: CHECK THIS SLICING!
+        # conjP case:
         elif down.get_pos()[:4] == 'Conj':
             sentiment = self.conj(left, down)
         # V case
@@ -193,14 +231,10 @@ class Compositional:
         else:
             # equal weights to both sides
             sentiment = self.general(left, down, 0.7)
-        #print 'combining sentiment of ' + left.get_pos() + ' ' + down.get_pos()
-        #print parent, sentiment
         return sentiment
 
     def neg(self, down, hyperparameter=1.0):
-        # sliding weight depending on the value - higher sentiment score, higher weight
-        # the value for change is the amount the original score will be changed
-        # to find this, we square the sentiment of the negated nonterminal
+        # subtracting hyperparameter from sentiment score of the right-side argument
         if down.get_sentiment() > 0:
             return down.get_sentiment()-hyperparameter
         elif down.get_sentiment() < 0:
@@ -218,6 +252,7 @@ class Compositional:
             return ((left.get_sentiment() * self.but_left_weight) + (down.get_sentiment() * (1-self.but_left_weight)))
 
     def general(self, left, down, weight=0.5):
+        # base case
         if left.get_sentiment() == 0.0 and down.get_sentiment() == 0:
             return 0.0
         elif left.get_sentiment() == 0.0 and down.get_sentiment() != 0:
@@ -228,7 +263,7 @@ class Compositional:
             return (left.get_sentiment() * weight) + (down.get_sentiment() * (1-weight))
 
     def test(self):
-        #self.parse_rules()
+        # classify test data and return as a dict
         tagged_sentences = {}
         for item in self.test_data:
             tagged = self.tag_sentence(item)

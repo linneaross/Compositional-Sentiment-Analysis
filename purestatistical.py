@@ -4,6 +4,9 @@ import numpy as np
 import sys
 import string
 import re
+# lexical sentiment resources
+from senticnet5 import senticnet
+#from pattern.en import sentiment
 
 class PureStatistical:
 
@@ -30,6 +33,7 @@ class PureStatistical:
         self.max_prob = 0.0
 
     def train_model(self):
+        # increments counts of all n-grams and their backoff grams
         for (item, label) in [(self.pos_data_file, 'pos'), (self.neg_data_file, 'neg')]:
             for data in item:
                 self.class_doc_counts[label] += 1.0
@@ -66,19 +70,23 @@ class PureStatistical:
                         n_temp = n
 
     def tokenize(self, sentence):
+        # lowercases data
         sentence = sentence.lower()
+        # eliminates leading and trailing whitespace
         sentence = sentence.strip()
+        # eliminates punctuation
         sentence = sentence.translate(None, string.punctuation)
+        # tokenizes by word
         tokens = sentence.split()
         return tokens
 
     def classify_word(self, word, alpha):
+        # returns the best tag for a word as well as the positive and negative probabilities
         best_tag = ''
         highest_prob = 0.0
         pos_prob = 0.0
         neg_prob = 0.0
         for label in self.class_unit_counts:
-            # fix the prob calculation denominator
             prob_word_given_label = self.class_unit_counts[label][''][word]/self.class_token_cardinality[label]
             prob_label = (self.class_doc_counts[label]/self.total_doc_count)
             prob = (prob_word_given_label * prob_label) + alpha
@@ -92,6 +100,7 @@ class PureStatistical:
         return best_tag, pos_prob, neg_prob
 
     def even_split(self, word):
+        # returns percentage likelihood of positive class membership
         if self.class_unit_counts['pos'][''][word] > 0.0:
             return self.class_unit_counts['pos'][''][word]/(self.class_unit_counts['pos'][''][word]+self.class_unit_counts['neg'][''][word])
         elif self.class_unit_counts['neg'][''][word] > 0.0:
@@ -100,6 +109,7 @@ class PureStatistical:
             return 0.5
 
     def classify_datum(self, datum, alpha):
+        # classifies an entire string
         storage = {}
         tokens = self.tokenize(datum)
         tokens = ['#'] * (self.n - 1) + tokens
@@ -129,6 +139,7 @@ class PureStatistical:
             return 'neg', storage['neg']
 
     def to_string(self, tokens):
+        # helper function for creating dict keys for storage and access
         string = ''
         for word in tokens:
             if len(string) == 0:
@@ -138,12 +149,14 @@ class PureStatistical:
         return string
 
     def compute_probability(self, word, history, order, label, alpha):
+        # helper function that just calculates probability
         gram = str(order) + '-gram'
         prob_sequence = (self.class_unit_counts[label][history][word] + alpha)/(len(self.class_unit_counts[label][history]) + (alpha * len(self.vocab[label][gram])))
         prob_label = self.class_doc_counts[label]/self.total_doc_count
         return prob_sequence * prob_label
 
     def test(self, test_data, alpha, verbose=False):
+        # returns dict of sentences and best tags
         result = {}
         for item in test_data:
             tag, prob = self.classify_datum(item, alpha)

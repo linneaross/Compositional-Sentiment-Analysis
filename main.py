@@ -4,12 +4,19 @@ import numpy as np
 import sys
 import string
 import re
+import Compositional
+import Tag
+import PureStatistical
 # lexical sentiment resources
 from senticnet5 import senticnet
 #from pattern.en import sentiment
-# part of speech tagger
+
+# NLTK part of speech tagger
 import nltk
 #nltk.download('averaged_perceptron_tagger')
+
+# populating a dict that can be used for lexical sentiment values
+# from Stanford Sentiment Treebank resource
 treebank = {}
 scores = {}
 for line in open('dictionary.txt'):
@@ -26,7 +33,8 @@ for line in open('sentiment_labels.txt'):
 for item in treebank:
     treebank[item] = scores[treebank[item]]
 
-# sentiwords lexical sentiment resource - not currently in use
+# populating a dict that can be used for lexical sentiment values
+# from Sentiwords resource
 sentiwords = {}
 for line in open('sentiwords.txt'):
     word = line.split('#')
@@ -45,11 +53,14 @@ rules = open(sys.argv[3])
 # testing data for every model
 testing = open(sys.argv[4])
 test_dict = {}
+# slicing the data such that the datum is the key and the sentiment tag is the value
 for line in testing:
     components = line.split('#')
     components[1] = re.sub('\n','', components[1])
     test_dict[components[1]] = components[0]
 
+# parsing the rule file into a dict
+# parent is the key, a list of all possible combinations of children are value
 def parse_rules(rule_file):
     rules = {}
     for line in rule_file:
@@ -63,24 +74,27 @@ def parse_rules(rule_file):
             rules[left_side].append(right_side)
     return rules
 
+# create the dict, assign to rules variable
 rules = parse_rules(rules)
 
-nb = PureStatistical(pos_data, neg_data, test_dict, 3, .001)
+nb = PureStatistical(pos_data, neg_data, test_dict, 1, .001)
 nb.train_model()
-print 'NB'
-print nb_results
+nb_results = nb.test(test_dict, .001, verbose=False)
+#print 'PURE-STAT'
+#print nb_results
 
 comp = Compositional(rules, test_dict, None, False, 0.5, 0.0, 0.9, 0.9, 0.7, 0.75)
 comp_results = comp.test()
-print 'LEX-COMP'
-print comp_results
+#print 'LEX-COMP'
+#print comp_results
 
 hybrid = Compositional(rules, test_dict, nb, False, 0.5, 0.4, 0.6, 0.2, 0.7, 0.75)
 hybrid_results = hybrid.test()
-print 'STAT-COMP'
-print hybrid_results
+#print 'STAT-COMP'
+#print hybrid_results
 
 def test_models(test_dict, nb_output, comp_output, hybrid_output=None):
+    # compute accuracy, precision, recall, f-score for each model
     if hybrid_output != None:
         result_dict = {'nb': {'accuracy': 0.0, 'precision': 0.0, 'recall': 0.0, 'f-score': 0.0}, 'comp': {'accuracy': 0.0, 'precision': 0.0, 'recall': 0.0, 'f-score': 0.0}, 'hybrid': {'accuracy': 0.0, 'precision': 0.0, 'recall': 0.0, 'f-score': 0.0}}
         # test nb model
@@ -194,6 +208,7 @@ def test_models(test_dict, nb_output, comp_output, hybrid_output=None):
     return result_dict
 
 def report_results(test_results):
+    # verbose reporting of scores for each model
     for model in test_results:
         print '==================='
         print 'MODEL: ' + model
@@ -201,10 +216,7 @@ def report_results(test_results):
         print 'PRECISION: ' + str(test_results[model]['precision'])
         print 'RECALL: ' + str(test_results[model]['recall'])
         print 'F-SCORE: ' + str(test_results[model]['f-score'])
-
-print 'PURE-STAT length: ' + str(len(nb_results))
-print 'LEX-COMP length: ' + str(len(comp_results))
-print 'STAT-COMP length: ' + str(len(hybrid_results))
+# checking if any items are unparseable given the ruleset
 for item in nb_results:
     if item not in comp_results:
         print 'Item not parsed by LEX-COMP: ' + item
